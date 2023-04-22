@@ -1,11 +1,43 @@
 <script setup>
+import { ref } from 'vue';
 import Header from './components/Header.vue'
+import Tasks from './components/Tasks.vue'
+
+let tasks = ref([
+  {
+    id: 1,
+    text: 'Doctors Appointment',
+    day: 'March 1st at 2:30pm',
+    reminder: false,
+  },
+  {
+    id: 2,
+    text: 'Last day at PINE',
+    day: 'April 28th',
+    reminder: true,
+  },
+  {
+    id: 3,
+    text: 'First day at Unleaded',
+    day: 'May 1st at 7:00am',
+    reminder: true,
+  }
+])
+
+const deleteTask = (id) => {
+  if (confirm('Are you sure?')) {
+    tasks.value = tasks.value.filter((task) => task.id !== id)
+    console.log(tasks)
+  }
+}
+
 </script>
 
 <template>
   <header>
     <div class="container">
       <Header title="Task Tracker" />
+      <Tasks @delete-task="deleteTask" :tasks="tasks" />
     </div>
   </header>
 </template>

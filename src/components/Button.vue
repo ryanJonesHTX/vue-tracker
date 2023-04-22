@@ -1,12 +1,15 @@
 <script setup>
-defineProps: ({
+defineProps({
   text: String,
   color: String,
+})
+
+function onClick() {
+  console.log('click')
 }
-)
 
 </script>
 
 <template>
-  <button :style="{ background: color }" class="btn">{{ text }}</button>
+  <button @click="onClick()" :style="{ background: color }" class="btn">{{ text }}</button>
 </template>
