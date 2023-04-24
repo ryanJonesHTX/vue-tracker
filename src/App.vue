@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import Header from './components/Header.vue'
 import Tasks from './components/Tasks.vue'
+import AddTask from './components/AddTask.vue'
 
 let tasks = ref([
   {
@@ -24,11 +25,24 @@ let tasks = ref([
   }
 ])
 
+let showAddTask = ref(false)
+
+const addTask = (task) => {
+  tasks.value = [...tasks.value, task]
+}
+
 const deleteTask = (id) => {
   if (confirm('Are you sure?')) {
     tasks.value = tasks.value.filter((task) => task.id !== id)
-    console.log(tasks)
   }
+}
+
+const toggleReminder = (id) => {
+  tasks.value = tasks.value.map((task) => task.id === id ? { ...task, reminder: !task.reminder } : task)
+}
+
+const toggleAddTask = () => {
+  showAddTask.value = !showAddTask.value
 }
 
 </script>
@@ -36,8 +50,11 @@ const deleteTask = (id) => {
 <template>
   <header>
     <div class="container">
-      <Header title="Task Tracker" />
-      <Tasks @delete-task="deleteTask" :tasks="tasks" />
+      <Header @toggle-add-task="toggleAddTask" title="Task Tracker" :showAddTask="showAddTask" />
+      <div v-if="showAddTask">
+        <AddTask @add-task="addTask" />
+      </div>
+      <Tasks @toggle-reminder="toggleReminder" @delete-task="deleteTask" :tasks="tasks" />
     </div>
   </header>
 </template>

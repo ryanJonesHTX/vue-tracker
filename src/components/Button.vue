@@ -4,8 +4,10 @@ defineProps({
   color: String,
 })
 
+const emit = defineEmits(['btn-click'])
+
 function onClick() {
-  console.log('click')
+  emit('btn-click')
 }
 
 </script>
