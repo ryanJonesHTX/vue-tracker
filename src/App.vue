@@ -4,46 +4,76 @@ import Header from './components/Header.vue'
 import Tasks from './components/Tasks.vue'
 import AddTask from './components/AddTask.vue'
 
-let tasks = ref([
-  {
-    id: 1,
-    text: 'Doctors Appointment',
-    day: 'March 1st at 2:30pm',
-    reminder: false,
-  },
-  {
-    id: 2,
-    text: 'Last day at PINE',
-    day: 'April 28th',
-    reminder: true,
-  },
-  {
-    id: 3,
-    text: 'First day at Unleaded',
-    day: 'May 1st at 7:00am',
-    reminder: true,
-  }
-])
+const fetchTasks = async () => {
+  const res = await fetch('api/tasks')
+
+  const data = await res.json()
+
+  return data
+}
+
+const fetchTask = async (id) => {
+  const res = await fetch(`api/tasks/${id}`)
+
+  const data = await res.json()
+
+  return data
+}
+
+let tasks = ref([])
+fetchTasks().then(data => {
+  tasks.value = data
+})
 
 let showAddTask = ref(false)
 
-const addTask = (task) => {
-  tasks.value = [...tasks.value, task]
+const addTask = async (task) => {
+  const res = await fetch('/api/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(task)
+  })
+
+  const data = await res.json()
+
+  tasks.value = [...tasks.value, data]
 }
 
-const deleteTask = (id) => {
+const deleteTask = async (id) => {
   if (confirm('Are you sure?')) {
-    tasks.value = tasks.value.filter((task) => task.id !== id)
+    const res = await fetch(`api/tasks/${id}`, {
+      method: 'DELETE'
+    })
+
+    res.status === 200 ? (tasks.value = tasks.value.filter((task) => task.id !== id)) : alert('Error deleting task')
+
+
   }
 }
 
-const toggleReminder = (id) => {
-  tasks.value = tasks.value.map((task) => task.id === id ? { ...task, reminder: !task.reminder } : task)
+const toggleReminder = async (id) => {
+  const taskToToggle = await fetchTask(id)
+  const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
+
+  const res = await fetch(`api/tasks/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(updTask)
+  })
+
+  const data = await res.json()
+
+  tasks.value = tasks.value.map((task) => task.id === id ? { ...task, reminder: data.reminder } : task)
 }
 
 const toggleAddTask = () => {
   showAddTask.value = !showAddTask.value
 }
+
 
 </script>
 
